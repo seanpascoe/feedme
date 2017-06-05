@@ -48,5 +48,6 @@ csv({
 })
 .on('done',(error)=>{
   console.log(products)
+  console.log(Object.keys(products[0]))
     console.log('end')
 })
