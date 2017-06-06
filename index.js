@@ -1,14 +1,10 @@
-let fs = require('fs');
-let csv = require('csvtojson');
-
-// fs.readFile('singlefeed.txt', 'utf-8', (err, data) => {
-//   let feed = data.split('\n')
-//   console.log(feed[1]);
-// })
+const csv = require('csvtojson');
+const request = require('request')
+const fs = require('fs');
 
 let products = []
 
-csv({
+let jason = csv({
   noheader: false,
   headers: [
   	'id', 'gtin',	'title', 'description',	'sale_price',	'link', 'image_link', 'product_type', 'brand', 'availability', 'condition',	'mpn', 'PAYMENT_TYPE',	'KEYWORDS',	'price', 'sale_price2', 'gender',	'DEPARTMENT',	'shipping(price)', 'size', 'shipping_weight', 'color', 'PROMOTIONAL_MESSAGE', 'ZIP_CODE', 'CURRENCY', 'item_group_id', 'age_group', 'custom label 0'
@@ -42,12 +38,25 @@ csv({
   if (product.condition === 'New') {
     product.condition = 'new';
   }
-
   products.push(product);
 
 })
+.on('error', (err) => console.log(err))
 .on('done',(error)=>{
   console.log(products)
   console.log(Object.keys(products[0]))
-    console.log('end')
+  console.log(products.length)
+  console.log('end')
 })
+
+
+
+// csv()
+// .fromStream(request.get('http://www.bobwards.com/feeds/singlefeed.txt'))
+// .on('csv',(csvRow)=>{
+//     // csvRow is an array
+// })
+// .on('done',(error)=>{
+//   console.log(error)
+//   console.log('done')
+// })
