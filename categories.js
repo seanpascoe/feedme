@@ -9,16 +9,31 @@ let processCats = () => {
   csv({
     delimiter: "\t",
     noheader: false,
-    includeColumns: ['product_type', 'google_product_category']
   })
   .fromFile('gshopping.txt')
   .on('json',(row)=>{
-    categories.push(row);
+    let bwCat = row.bwCat
+    let googleCat = row.googleCat.replace(/\s?([>])\s?/g, " > ")
+    let category = {bwCat, googleCat}
+    categories.push(category);
   })
   .on('error', error => console.log(err))
   .on('done', error => {
     if (error) console.log(error);
-    console.log(categories);
+    let catsReduced = reduceUniqCats(categories);
+    saveCatsFile(JSON.stringify(catsReduced));
+  })
+}
+
+const reduceUniqCats = (arr) => {
+  let uniqCats = []
+  return arr.filter(cat => {
+    if (uniqCats.indexOf(cat.bwCat) === -1) {
+      uniqCats.push(cat.bwCat)
+      return true
+    } else {
+      return false
+    }
   })
 }
 
@@ -28,10 +43,10 @@ const convertToTabbedFeed = (products, fields) => {
 }
 
 
-const saveFeedFile = (feed) => {
-  fs.writeFile('google-shopping.txt', feed, function(err) {
+const saveCatsFile = (cats) => {
+  fs.writeFile('categoriesList.js', cats, function(err) {
     if (err) throw err;
-    console.log('feed file saved');
+    console.log('cat file saved');
   });
 }
 
