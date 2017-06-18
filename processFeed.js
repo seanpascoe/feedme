@@ -2,8 +2,9 @@ const csv = require('csvtojson');
 const json2csv = require('json2csv');
 const request = require('request')
 const fs = require('fs');
+const categories = require('./categoriesList.json');
 
-
+const OUTPUT_FILENAME = 'google-shopping.txt'
 
 let processFeed = () => {
   let products = []
@@ -42,6 +43,10 @@ let processFeed = () => {
     if (product.condition === 'New') {
       product.condition = 'new';
     }
+
+    //create google category
+    product['google_​​product_​​category'] = categories[product.product_type]
+
     products.push(product);
 
   })
@@ -61,9 +66,9 @@ const convertToTabbedFeed = (products, fields) => {
 
 
 const saveFeedFile = (feed) => {
-  fs.writeFile('google-shopping.txt', feed, function(err) {
+  fs.writeFile(OUTPUT_FILENAME, feed, function(err) {
     if (err) throw err;
-    console.log('feed file saved');
+    console.log(`${OUTPUT_FILENAME} saved`);
   });
 }
 

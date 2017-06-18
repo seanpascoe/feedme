@@ -5,23 +5,25 @@ const fs = require('fs');
 
 
 let processCats = () => {
-  let categories = []
+  let categories = {}
   csv({
     delimiter: "\t",
     noheader: false,
+    includeColumns: ['product_type', 'google_product_category']
   })
   .fromFile('gshopping.txt')
   .on('json',(row)=>{
-    let bwCat = row.bwCat
-    let googleCat = row.googleCat.replace(/\s?([>])\s?/g, " > ")
-    let category = {bwCat, googleCat}
-    categories.push(category);
+    let bwCat = row['product_type']
+    let googleCat = row['google_product_category'].replace(/\s?([>])\s?/g, " > ")
+    // let category = {bwCat, googleCat}
+    categories[bwCat] = googleCat;
   })
   .on('error', error => console.log(err))
   .on('done', error => {
     if (error) console.log(error);
-    let catsReduced = reduceUniqCats(categories);
-    saveCatsFile(JSON.stringify(catsReduced));
+    // let catsReduced = reduceUniqCats(categories);
+    // saveCatsFile(JSON.stringify(catsReduced));
+    saveCatsFile(JSON.stringify(categories));
   })
 }
 
@@ -44,7 +46,7 @@ const convertToTabbedFeed = (products, fields) => {
 
 
 const saveCatsFile = (cats) => {
-  fs.writeFile('categoriesList.js', cats, function(err) {
+  fs.writeFile('categoriesList.json', cats, function(err) {
     if (err) throw err;
     console.log('cat file saved');
   });
