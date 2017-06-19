@@ -3,6 +3,7 @@ const json2csv = require('json2csv');
 const request = require('request')
 const fs = require('fs');
 const categories = require('./categoriesList.json');
+const prohibitedCategories = require('./prohibitedCategories.json');
 
 const OUTPUT_FILENAME = 'google-shopping.txt'
 
@@ -47,7 +48,12 @@ let processFeed = () => {
     //create google category
     product['google_​​product_​​category'] = categories[product.product_type]
 
-    products.push(product);
+    //filter prohibited categories
+    if (prohibitedCategories.find(cat => cat.toUpperCase() === product.product_type.toUpperCase())) {
+      return
+    } else {
+      products.push(product);
+    }
 
   })
   .on('error', error => console.log(err))
@@ -66,7 +72,7 @@ const convertToTabbedFeed = (products, fields) => {
 
 
 const saveFeedFile = (feed) => {
-  fs.writeFile(OUTPUT_FILENAME, feed, function(err) {
+  fs.writeFile(`output/${OUTPUT_FILENAME}`, feed, function(err) {
     if (err) throw err;
     console.log(`${OUTPUT_FILENAME} saved`);
   });
